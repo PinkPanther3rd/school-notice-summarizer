@@ -39,7 +39,7 @@ if st.button("✅ 追加して要約", type="primary", use_container_width=True)
         
         st.session_state.notices.append(new_notice)
         
-        # 簡易タスク抽出
+        # タスク抽出
         task_keywords = ["提出", "期限", "持参", "準備", "宿題", "提出物"]
         if any(kw in notice_text for kw in task_keywords):
             st.session_state.tasks.append({
@@ -48,7 +48,35 @@ if st.button("✅ 追加して要約", type="primary", use_container_width=True)
                 "detail": notice_text[:120]
             })
         
-        st.success("追加しました！")
+        st.success("✅ 追加しました！ 次のお知らせをどうぞ")
         
-        # ② 入力欄をクリア
-        st.session_state.notice_input = ""
+        # 入力欄クリア（正しい方法）
+        st.rerun()
+        
+    else:
+        st.error("お知らせを入力してください")
+
+# 表示部分
+tab1, tab2 = st.tabs(["📋 お知らせリスト", "✅ タスクリスト"])
+
+with tab1:
+    if st.session_state.notices:
+        for notice in reversed(st.session_state.notices):
+            with st.expander(f"📅 {notice['date']} - {notice['title']}"):
+                st.write("**要約:**")
+                st.write(notice['summary'])
+                st.write("---")
+                st.write("**原文:**")
+                st.write(notice['full_text'])
+    else:
+        st.info("まだお知らせがありません")
+
+with tab2:
+    if st.session_state.tasks:
+        st.subheader("やるべきこと")
+        for task in reversed(st.session_state.tasks):
+            st.warning(f"**{task['date']}** {task['task']}\n\n{task['detail']}")
+    else:
+        st.info("現在タスクはありません")
+
+st.caption("※ ブラウザを閉じるとデータは消えます")
